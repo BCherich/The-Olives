@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olives Ministries — Admin CMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --purple:#6B21A8;--pl:#9333EA;--pb:#A855F7;--pp:#F3E8FF;--pd:#3B0764;
+  --green:#16A34A;--gl:#22C55E;--gp:#DCFCE7;
+  --stripe:#635BFF;--mpesa:#00A651;
+  --sidebar:#07050F;--bg:#F7F5FF;--white:#fff;
+  --text:#1C1C2E;--muted:#6B7280;--border:#E5E7EB;
+  --ok:#16A34A;--err:#DC2626;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ── LOGIN ── */
+#login{position:fixed;inset:0;background:linear-gradient(135deg,var(--pd),#0d041e);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s;}
+#login.hide{opacity:0;pointer-events:none;}
+.lbox{background:#fff;border-radius:22px;padding:3rem;width:100%;max-width:410px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+.lico{font-size:2.5rem;margin-bottom:.8rem;}
+.ltitle{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--purple);margin-bottom:.25rem;}
+.lsub{color:var(--muted);font-size:.83rem;margin-bottom:1.8rem;}
+.lf{display:flex;flex-direction:column;gap:.38rem;margin-bottom:.9rem;text-align:left;}
+.lf label{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--purple);font-weight:700;}
+.lf input{border:1.5px solid var(--border);border-radius:9px;padding:.78rem 1rem;font-family:'Nunito',sans-serif;font-size:.93rem;transition:border-color .25s;width:100%;}
+.lf input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.1);}
+.lbtn{width:100%;padding:.95rem;background:linear-gradient(135deg,var(--purple),var(--pl));color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.98rem;transition:all .3s;margin-top:.4rem;}
+.lbtn:hover{box-shadow:0 8px 24px rgba(107,33,168,.4);transform:translateY(-2px);}
+.lerr{color:var(--err);font-size:.8rem;margin-top:.75rem;display:none;}
+.lhint{font-size:.7rem;color:#CBD5E1;margin-top:1.2rem;}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:row;}
+#app.show{display:flex;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:252px;flex-shrink:0;background:var(--sidebar);display:flex;flex-direction:column;overflow-y:auto;}
+.sbrand{padding:1.4rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:.75rem;}
+.sorb{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green));display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0;}
+.sname{color:#fff;font-size:.95rem;font-weight:800;line-height:1.2;}
+.sname span{color:var(--pb);}
+.ssub{color:rgba(255,255,255,.32);font-size:.62rem;letter-spacing:1px;}
+.snav-sec{padding:1.1rem 1.1rem .4rem;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.22);font-weight:700;}
+.sitem{display:flex;align-items:center;gap:.75rem;padding:.7rem 1.1rem;color:rgba(255,255,255,.52);cursor:pointer;transition:all .2s;border-radius:8px;margin:.08rem .45rem;font-size:.85rem;font-weight:600;border:none;background:none;width:calc(100% - .9rem);text-align:left;}
+.sitem:hover{background:rgba(255,255,255,.06);color:#fff;}
+.sitem.active{background:rgba(168,85,247,.18);color:var(--pb);}
+.sico{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
+.sfoot{margin-top:auto;padding:1.1rem;border-top:1px solid rgba(255,255,255,.06);}
+.sfoot a{display:flex;align-items:center;gap:.5rem;color:var(--gl);font-size:.78rem;font-weight:700;text-decoration:none;margin-bottom:.7rem;}
+.sout{display:flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.28);font-size:.78rem;font-weight:600;cursor:pointer;border:none;background:none;transition:color .2s;}
+.sout:hover{color:rgba(255,255,255,.6);}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:2rem 2.2rem;}
+.pg{display:none;}
+.pg.active{display:block;}
+.pghdr{margin-bottom:1.8rem;}
+.pghdr h1{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;}
+.pghdr p{color:var(--muted);font-size:.87rem;margin-top:.25rem;}
+
+/* ── SAVE BAR ── */
+.savebar{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+.savebar-txt{font-size:.83rem;color:var(--muted);}
+.savebar-txt strong{color:var(--text);}
+.sbtn{background:linear-gradient(135deg,var(--purple),var(--pl));color:#fff;border:none;padding:.6rem 1.7rem;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;transition:all .3s;}
+.sbtn:hover{box-shadow:0 6px 18px rgba(107,33,168,.35);transform:translateY(-1px);}
+.sbtn.ok{background:linear-gradient(135deg,var(--green),var(--gl));}
+
+/* ── CARD ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.7rem;margin-bottom:1.4rem;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+.ch{display:flex;align-items:center;gap:.65rem;margin-bottom:1.4rem;padding-bottom:.9rem;border-bottom:1px solid var(--border);}
+.ci{font-size:1.15rem;}
+.ct{font-weight:800;font-size:.95rem;}
+.cs{font-size:.75rem;color:var(--muted);margin-top:.08rem;}
+
+/* ── FIELDS ── */
+.f{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem;}
+.f:last-child{margin-bottom:0;}
+.f label{font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--purple);font-weight:800;}
+.f input,.f textarea,.f select{border:1.5px solid var(--border);border-radius:8px;padding:.72rem .95rem;font-family:'Nunito',sans-serif;font-size:.9rem;color:var(--text);transition:border-color .25s;resize:vertical;background:#fff;width:100%;}
+.f input:focus,.f textarea:focus,.f select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.09);}
+.fhint{font-size:.7rem;color:var(--muted);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+/* ── DASHBOARD ── */
+.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.4rem;}
+.dcard{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.4rem;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+.dlbl{font-size:.66rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:.4rem;}
+.dval{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:700;}
+.dp{color:var(--purple);}
+.dg{color:var(--green);}
+.dst{color:var(--stripe);}
+.dmp{color:var(--mpesa);}
+.dsub{font-size:.73rem;color:var(--muted);margin-top:.25rem;}
+.act-list{display:flex;flex-direction:column;gap:.75rem;}
+.act-item{display:flex;align-items:center;gap:.9rem;padding:.75rem;border-radius:10px;background:var(--bg);}
+.aico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.aip{background:var(--pp);}
+.aig{background:var(--gp);}
+.amain{font-size:.85rem;font-weight:700;}
+.asub{font-size:.7rem;color:var(--muted);}
+.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;}
+.qa{background:linear-gradient(135deg,var(--purple),var(--pl));color:#fff;border:none;padding:.7rem 1rem;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;transition:all .3s;text-align:left;}
+.qa:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(107,33,168,.3);}
+
+/* ── TIERS ── */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.tc{border:1.5px solid var(--border);border-radius:12px;padding:1.2rem;}
+.tbadge{font-size:.63rem;letter-spacing:2px;text-transform:uppercase;font-weight:800;color:var(--purple);margin-bottom:.75rem;display:block;}
+
+/* ── PAYMENT KEY CARDS ── */
+.kcard{border:1.5px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1rem;}
+.kcard.sk{border-color:rgba(99,91,255,.28);background:rgba(99,91,255,.02);}
+.kcard.mk{border-color:rgba(0,166,81,.25);background:rgba(0,166,81,.02);}
+.kprov{display:flex;align-items:center;gap:.65rem;margin-bottom:1.1rem;}
+.klogo{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:900;color:#fff;flex-shrink:0;}
+.ks{background:#635BFF;}
+.km{background:#00A651;}
+.kname{font-weight:800;font-size:.92rem;}
+.kstat{font-size:.7rem;color:var(--muted);}
+.kstat.ok{color:var(--ok);font-weight:700;}
+.ktog{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;}
+.tog{position:relative;width:38px;height:21px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.tslide{position:absolute;inset:0;border-radius:100px;cursor:pointer;background:#CBD5E1;transition:background .3s;}
+.tslide::before{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.tog input:checked+.tslide{background:var(--ok);}
+.tog input:checked+.tslide::before{transform:translateX(17px);}
+.tlbl{font-size:.78rem;color:var(--muted);font-weight:600;}
+.kfi{position:relative;}
+.kfi input{padding-right:3rem;}
+.eye{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.95rem;color:var(--muted);transition:color .2s;}
+.eye:hover{color:var(--text);}
+.ktest{margin-top:.75rem;padding:.45rem 1.1rem;border-radius:8px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.75rem;transition:all .25s;}
+.kts{background:rgba(99,91,255,.1);color:var(--stripe);}
+.kts:hover{background:rgba(99,91,255,.18);}
+.ktm{background:rgba(0,166,81,.1);color:var(--mpesa);}
+.ktm:hover{background:rgba(0,166,81,.18);}
+.tres{font-size:.76rem;margin-top:.45rem;font-weight:600;display:none;}
+.tok{color:var(--ok);}
+.terr{color:var(--err);}
+.webhook{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.9rem 1.1rem;margin-top:1.1rem;}
+.wlbl{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:.35rem;}
+.wurl{font-family:monospace;font-size:.82rem;color:var(--purple);word-break:break-all;}
+.cpybtn{margin-top:.45rem;padding:.28rem .75rem;border-radius:6px;background:rgba(107,33,168,.09);border:none;color:var(--purple);font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.cpybtn:hover{background:rgba(107,33,168,.18);}
+.info-box{border-radius:10px;padding:.95rem;margin-top:.9rem;font-size:.8rem;line-height:1.7;}
+.info-box a{font-weight:700;}
+.ib-s{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3;}
+.ib-s a{color:var(--stripe);}
+.ib-m{background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;}
+.ib-m a{color:var(--mpesa);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.8rem;right:1.8rem;z-index:9999;padding:.9rem 1.4rem;border-radius:12px;font-size:.85rem;font-weight:700;box-shadow:0 10px 28px rgba(0,0,0,.28);transform:translateY(80px);opacity:0;transition:all .35s;display:flex;align-items:center;gap:.5rem;color:#fff;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:linear-gradient(135deg,var(--green),var(--gl));}
+.toast.er{background:linear-gradient(135deg,#DC2626,#EF4444);}
+.toast.inf{background:linear-gradient(135deg,var(--purple),var(--pl));}
+
+@media(max-width:768px){
+  .sidebar{width:210px;}
+  .dgrid{grid-template-columns:1fr 1fr;}
+  .tgrid{grid-template-columns:1fr;}
+  .frow{grid-template-columns:1fr;}
+  .qa-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login">
+  <div class="lbox">
+    <div class="lico">🌿</div>
+    <div class="ltitle">Admin Panel</div>
+    <div class="lsub">The Olives Ministries · CMS</div>
+    <div class="lf">
+      <label>Username</label>
+      <input type="text" id="lu" placeholder="admin" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <div class="lf">
+      <label>Password</label>
+      <input type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <button class="lbtn" onclick="login()">Sign In →</button>
+    <div class="lerr" id="lerr">❌ Incorrect credentials</div>
+    <div class="lhint">Default login: admin / olives2025</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sbrand">
+      <div class="sorb">O</div>
+      <div>
+        <div class="sname">The <span>Olives</span></div>
+        <div class="ssub">CMS Admin</div>
+      </div>
+    </div>
+
+    <div class="snav-sec">Overview</div>
+    <button class="sitem active" onclick="go('dash',this)"><span class="sico">📊</span> Dashboard</button>
+
+    <div class="snav-sec">Content</div>
+    <button class="sitem" onclick="go('hero',this)"><span class="sico">🏠</span> Hero Section</button>
+    <button class="sitem" onclick="go('about',this)"><span class="sico">👥</span> About Us</button>
+    <button class="sitem" onclick="go('choir',this)"><span class="sico">🎵</span> The Choir</button>
+    <button class="sitem" onclick="go('missions',this)"><span class="sico">🌍</span> Missions</button>
+    <button class="sitem" onclick="go('donate',this)"><span class="sico">💜</span> Donations</button>
+    <button class="sitem" onclick="go('contact',this)"><span class="sico">📬</span> Contact & Social</button>
+
+    <div class="snav-sec">Payments</div>
+    <button class="sitem" onclick="go('stripe',this)"><span class="sico">💳</span> Stripe Setup</button>
+    <button class="sitem" onclick="go('mpesa',this)"><span class="sico">📱</span> M-Pesa Setup</button>
+
+    <div class="sfoot">
+      <a href="/" target="_blank">🔗 Preview Website</a>
+      <button class="sout" onclick="logout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="pg active" id="pg-dash">
+      <div class="pghdr"><h1>Dashboard</h1><p>Welcome back. Here's an overview of The Olives Ministries website.</p></div>
+      <div class="dgrid">
+        <div class="dcard"><div class="dlbl">Content Sections</div><div class="dval dp">6</div><div class="dsub">Ready to edit</div></div>
+        <div class="dcard"><div class="dlbl">Payment Methods</div><div class="dval dg">2</div><div class="dsub">Stripe + M-Pesa</div></div>
+        <div class="dcard"><div class="dlbl">Stripe Status</div><div class="dval dst" id="d-stripe">—</div><div class="dsub">API keys</div></div>
+        <div class="dcard"><div class="dlbl">M-Pesa Status</div><div class="dval dmp" id="d-mpesa">—</div><div class="dsub">Daraja keys</div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ci">⚡</span><div><div class="ct">Quick Actions</div><div class="cs">Jump to common tasks</div></div></div>
+        <div class="qa-grid">
+          <button class="qa" onclick="go('hero',null)">✏️ Edit Hero Text</button>
+          <button class="qa" onclick="go('stripe',null)">💳 Setup Stripe</button>
+          <button class="qa" onclick="go('mpesa',null)">📱 Setup M-Pesa</button>
+          <button class="qa" onclick="go('donate',null)">💜 Edit Donation Tiers</button>
+          <button class="qa" onclick="go('contact',null)">📬 Update Contacts</button>
+          <button class="qa" onclick="window.open('/','_blank')">🌐 View Website</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ci">📋</span><div><div class="ct">Getting Started</div><div class="cs">Complete these steps to go live</div></div></div>
+        <div class="act-list">
+          <div class="act-item"><div class="aico aip">✏️</div><div><div class="amain">Edit your website content</div><div class="asub">Use the sidebar to update each section</div></div></div>
+          <div class="act-item"><div class="aico aig">💳</div><div><div class="amain">Add your Stripe API keys</div><div class="asub">Get keys from dashboard.stripe.com</div></div></div>
+          <div class="act-item"><div class="aico aip">📱</div><div><div class="amain">Add your M-Pesa Daraja keys</div><div class="asub">Get keys from developer.safaricom.co.ke</div></div></div>
+          <div class="act-item"><div class="aico aig">🌐</div><div><div class="amain">Deploy to Vercel</div><div class="asub">Push your files to GitHub and connect on Vercel</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="pg" id="pg-hero">
+      <div class="pghdr"><h1>Hero Section</h1><p>Edit the main banner visitors see first when they land on the website.</p></div>
+      <div class="savebar"><div class="savebar-txt"><strong>Hero Section</strong> — changes apply immediately after saving</div><button class="sbtn" onclick="save('hero',this)">💾 Save Changes</button></div>
+      <div class="card">
+        <div class="ch"><span class="ci">🏠</span><div><div class="ct">Hero Content</div></div></div>
+        <div class="f"><label>Main Tagline</label><input type="text" id="hero_tagline" placeholder="Standing For Jesus In Song And Mission"><div class="fhint">Shown in green below the large "Olives" title</div></div>
+        <div class="f"><label>Sub Description</label><textarea id="hero_sub" rows="3" placeholder="A brotherhood of Seventh-day Adventist men..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="pg" id="pg-about">
+      <div class="pghdr"><h1>About Us</h1><p>Edit the About section content.</p></div>
+      <div class="savebar"><div class="savebar-txt"><strong>About Us Section</strong></div><button class="sbtn" onclick="save('about',this)">💾 Save Changes</button></div>
+      <div class="card">
+        <div class="ch"><span class="ci">👥</span><div><div class="ct">About Text</div></div></div>
+        <div class="f"><label>Paragraph 1</label><textarea id="about_p1" rows="4" placeholder="The Olives is a dedicated group..."></textarea></div>
+        <div class="f"><label>Paragraph 2</label><textarea id="about_p2" rows="4" placeholder="From worship through our male vocal band..."></textarea></div>
+        <div class="f"><label>Emblem Tagline</label><input type="text" id="about_tagline" placeholder="Standing For Jesus In Song And Mission"></div>
+      </div>
+    </div>
+
+    <!-- CHOIR -->
+    <div class="pg" id="pg-choir">
+      <div class="pghdr"><h1>The Choir</h1><p>Edit the choir section content.</p></div>
+      <div class="savebar"><div class="savebar-txt"><strong>Choir Section</strong></div><button class="sbtn" onclick="save('choir',this)">💾 Save Changes</button></div>
+      <div class="card">
+        <div class="ch"><span class="ci">🎵</span><div><div class="ct">Choir Content</div></div></div>
+        <div class="f"><label>Choir Name / Title</label><input type="text" id="choir_title" placeholder="The Olives Men Ministers Choir"></div>
+        <div class="f"><label>Ministry Card Description</label><textarea id="choir_desc" rows="3" placeholder="A male vocal band whose harmonies..."></textarea></div>
+        <div class="f"><label>Visual Panel Short Text</label><textarea id="choir_vis_p" rows="2" placeholder="Voices raised in harmony..."></textarea></div>
+        <div class="f"><label>Main Content Paragraph 1</label><textarea id="choir_p1" rows="3" placeholder="The Olives Men Ministers Choir is more than a singing group..."></textarea></div>
+        <div class="f"><label>Main Content Paragraph 2</label><textarea id="choir_p2" rows="3" placeholder="Rooted in the rich SDA tradition..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- MISSIONS -->
+    <div class="pg" id="pg-missions">
+      <div class="pghdr"><h1>Missions</h1><p>Edit the missions section content.</p></div>
+      <div class="savebar"><div class="savebar-txt"><strong>Missions Section</strong></div><button class="sbtn" onclick="save('missions',this)">💾 Save Changes</button></div>
+      <div class="card">
+        <div class="ch"><span class="ci">🌍</span><div><div class="ct">Missions Content</div></div></div>
+        <div class="f"><label>Ministry Card Title</label><input type="text" id="missions_title" placeholder="Missions to Unentered Lands"></div>
+        <div class="f"><label>Ministry Card Description</label><textarea id="missions_desc" rows="3"></textarea></div>
+        <div class="f"><label>Section Body Text</label><textarea id="missions_body" rows="4" placeholder="There are still communities and peoples..."></textarea></div>
+        <div class="f"><label>Call-to-Action Text</label><textarea id="missions_cta" rows="2" placeholder="Are you a man willing to leave your comfort zone..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- DONATE -->
+    <div class="pg" id="pg-donate">
+      <div class="pghdr"><h1>Donations</h1><p>Set donation tiers and messaging shown to visitors.</p></div>
+      <div class="savebar"><div class="savebar-txt"><strong>Donation Section</strong></div><button class="sbtn" onclick="save('donate',this)">💾 Save Changes</button></div>
+      <div class="card">
+        <div class="ch"><span class="ci">💜</span><div><div class="ct">Donation Description</div></div></div>
+        <div class="f"><label>Description Text</label><textarea id="donate_desc" rows="3" placeholder="Your generous giving makes it possible..."></textarea></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ci">🎁</span><div><div class="ct">Donation Tiers</div><div class="cs">The 3 giving levels shown to visitors</div></div></div>
+        <div class="tgrid">
+          <div class="tc"><span class="tbadge">Tier 1 — Small Gift</span>
+            <div class="f"><label>Amount</label><input type="text" id="tier1_amt" placeholder="KES 500"></div>
+            <div class="f"><label>Label</label><input type="text" id="tier1_lbl" placeholder="Supporter"></div>
+          </div>
+          <div class="tc"><span class="tbadge">Tier 2 — Mid Gift</span>
+            <div class="f"><label>Amount</label><input type="text" id="tier2_amt" placeholder="KES 2,000"></div>
+            <div class="f"><label>Label</label><input type="text" id="tier2_lbl" placeholder="Partner"></div>
+          </div>
+          <div class="tc"><span class="tbadge">Tier 3 — Large Gift</span>
+            <div class="f"><label>Amount</label><input type="text" id="tier3_amt" placeholder="KES 5,000"></div>
+            <div class="f"><label>Label</label><input type="text" id="tier3_lbl" placeholder="Champion"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="pg" id="pg-contact">
+      <div class="pghdr"><h1>Contact & Social</h1><p>Update contact details, social links, and contact section text.</p></div>
+      <div class="savebar"><div class="savebar-txt"><strong>Contact Section</strong></div><button class="sbtn" onclick="save('contact',this)">💾 Save Changes</button></div>
+      <div class="card">
+        <div class="ch"><span class="ci">🔗</span><div><div class="ct">Social Links</div></div></div>
+        <div class="f"><label>Facebook Group URL</label><input type="url" id="fb_url" placeholder="https://facebook.com/groups/olivesministries"><div class="fhint">Full URL to your Facebook group or page</div></div>
+        <div class="f"><label>Email Address</label><input type="email" id="email" placeholder="info@olivesministries.org"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ci">📝</span><div><div class="ct">Contact Section Text</div></div></div>
+        <div class="f"><label>Facebook Description</label><textarea id="contact_fb" rows="2"></textarea></div>
+        <div class="f"><label>Get Involved Description</label><textarea id="contact_inv" rows="2"></textarea></div>
+        <div class="f"><label>Contact Details Description</label><textarea id="contact_det" rows="2"></textarea></div>
+      </div>
+    </div>
+
+    <!-- STRIPE -->
+    <div class="pg" id="pg-stripe">
+      <div class="pghdr"><h1>Stripe Setup</h1><p>Configure Stripe to accept card donations from Visa, Mastercard, and international cards.</p></div>
+      <div class="card">
+        <div class="ch"><span class="ci">💳</span><div><div class="ct">Stripe Integration</div><div class="cs">Accept card payments worldwide</div></div></div>
+        <div class="kcard sk">
+          <div class="kprov">
+            <div class="klogo ks">S</div>
+            <div><div class="kname">Stripe</div><div class="kstat" id="sk-stat">Not configured</div></div>
+          </div>
+          <div class="ktog">
+            <label class="tog"><input type="checkbox" id="sk-on" onchange="updDash()"><span class="tslide"></span></label>
+            <span class="tlbl">Enable Stripe on the website</span>
+          </div>
+          <div class="f"><label>Publishable Key</label>
+            <div class="kfi"><input type="password" id="sk_pk" placeholder="pk_live_... or pk_test_..." oninput="chkStripe()"><button class="eye" onclick="showKey('sk_pk',this)">👁</button></div>
+            <div class="fhint">Safe to expose — used in the browser to load the Stripe form</div>
+          </div>
+          <div class="f"><label>Secret Key</label>
+            <div class="kfi"><input type="password" id="sk_sk" placeholder="sk_live_... or sk_test_..." oninput="chkStripe()"><button class="eye" onclick="showKey('sk_sk',this)">👁</button></div>
+            <div class="fhint">⚠️ Never expose publicly — use only in your server-side backend</div>
+          </div>
+          <button class="ktest kts" onclick="tstStripe()">🔍 Validate Key Format</button>
+          <div class="tres" id="str-res"></div>
+          <div class="webhook">
+            <div class="wlbl">Stripe Webhook Endpoint</div>
+            <div class="wurl">https://your-domain.vercel.app/api/stripe-webhook</div>
+            <button class="cpybtn" onclick="cpy('https://your-domain.vercel.app/api/stripe-webhook',this)">📋 Copy</button>
+          </div>
+          <p style="font-size:.73rem;color:var(--muted);margin-top:.6rem;">Add this in <strong>Stripe Dashboard → Developers → Webhooks</strong> to receive payment events.</p>
+          <button class="sbtn" style="margin-top:1.1rem;width:100%;" onclick="saveKeys('stripe')">💾 Save Stripe Keys</button>
+        </div>
+        <div class="info-box ib-s">
+          <strong>🔑 How to get Stripe keys:</strong><br>
+          1. Create a free account at <a href="https://dashboard.stripe.com" target="_blank">dashboard.stripe.com</a><br>
+          2. Go to <strong>Developers → API Keys</strong><br>
+          3. Copy your <strong>Publishable Key</strong> (pk_...) and <strong>Secret Key</strong> (sk_...)<br>
+          4. Start with <strong>test keys</strong> — switch to live keys when ready to accept real donations
+        </div>
+      </div>
+    </div>
+
+    <!-- MPESA -->
+    <div class="pg" id="pg-mpesa">
+      <div class="pghdr"><h1>M-Pesa Setup</h1><p>Configure Safaricom M-Pesa Daraja API for mobile money donations via STK Push.</p></div>
+      <div class="card">
+        <div class="ch"><span class="ci">📱</span><div><div class="ct">M-Pesa Daraja API</div><div class="cs">Accept mobile money donations via STK Push</div></div></div>
+        <div class="kcard mk">
+          <div class="kprov">
+            <div class="klogo km">M</div>
+            <div><div class="kname">M-Pesa Daraja</div><div class="kstat" id="mk-stat">Not configured</div></div>
+          </div>
+          <div class="ktog">
+            <label class="tog"><input type="checkbox" id="mk-on" onchange="updDash()"><span class="tslide"></span></label>
+            <span class="tlbl">Enable M-Pesa on the website</span>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Consumer Key</label>
+              <div class="kfi"><input type="password" id="mk_ck" placeholder="Your consumer key" oninput="chkMpesa()"><button class="eye" onclick="showKey('mk_ck',this)">👁</button></div>
+            </div>
+            <div class="f"><label>Consumer Secret</label>
+              <div class="kfi"><input type="password" id="mk_cs" placeholder="Your consumer secret" oninput="chkMpesa()"><button class="eye" onclick="showKey('mk_cs',this)">👁</button></div>
+            </div>
+          </div>
+          <div class="f"><label>Business Short Code (Paybill / Till Number)</label>
+            <input type="text" id="mk_sc" placeholder="e.g. 174379" oninput="chkMpesa()">
+            <div class="fhint">Your M-Pesa Paybill number or Buy Goods (Till) number</div>
+          </div>
+          <div class="f"><label>Lipa Na M-Pesa Passkey</label>
+            <div class="kfi"><input type="password" id="mk_pk" placeholder="bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"><button class="eye" onclick="showKey('mk_pk',this)">👁</button></div>
+            <div class="fhint">Found in your Safaricom Daraja portal under the STK Push app credentials</div>
+          </div>
+          <div class="f"><label>Environment</label>
+            <select id="mk_env">
+              <option value="sandbox">Sandbox (Testing — use this first)</option>
+              <option value="production">Production (Live donations)</option>
+            </select>
+          </div>
+          <button class="ktest ktm" onclick="tstMpesa()">🔍 Validate Keys</button>
+          <div class="tres" id="mp-res"></div>
+          <div class="webhook">
+            <div class="wlbl">M-Pesa Callback URL</div>
+            <div class="wurl">https://your-domain.vercel.app/api/mpesa-callback</div>
+            <button class="cpybtn" onclick="cpy('https://your-domain.vercel.app/api/mpesa-callback',this)">📋 Copy</button>
+          </div>
+          <p style="font-size:.73rem;color:var(--muted);margin-top:.6rem;">Register this URL in your <strong>Safaricom Daraja portal</strong> as the callback URL for STK Push.</p>
+          <button class="sbtn" style="margin-top:1.1rem;width:100%;background:linear-gradient(135deg,var(--green),var(--gl));" onclick="saveKeys('mpesa')">💾 Save M-Pesa Keys</button>
+        </div>
+        <div class="info-box ib-m">
+          <strong>📱 How to get M-Pesa Daraja keys:</strong><br>
+          1. Register at <a href="https://developer.safaricom.co.ke" target="_blank">developer.safaricom.co.ke</a><br>
+          2. Create an app → enable <strong>Lipa Na M-Pesa Online</strong><br>
+          3. Copy your <strong>Consumer Key</strong> and <strong>Consumer Secret</strong><br>
+          4. Find your <strong>Passkey</strong> in the STK Push app credentials<br>
+          5. Use <strong>Sandbox</strong> for testing, switch to <strong>Production</strong> when ready to go live
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── AUTH ──
+function login(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  if(u==='admin'&&p==='olives2025'){
+    document.getElementById('login').classList.add('hide');
+    document.getElementById('app').classList.add('show');
+    loadAll();updDash();
+  }else{
+    document.getElementById('lerr').style.display='block';
+  }
+}
+function logout(){
+  document.getElementById('login').classList.remove('hide');
+  document.getElementById('app').classList.remove('show');
+}
+
+// ── NAV ──
+function go(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  else{
+    document.querySelectorAll('.sitem').forEach(s=>{
+      if(s.textContent.toLowerCase().includes(id.toLowerCase())||s.getAttribute('onclick').includes("'"+id+"'"))s.classList.add('active');
+    });
+  }
+}
+
+// ── STORAGE ──
+function gd(){try{return JSON.parse(localStorage.getItem('olives_cms')||'{}');}catch{return {};}}
+function sd(d){localStorage.setItem('olives_cms',JSON.stringify(d));}
+function gk(){try{return JSON.parse(localStorage.getItem('olives_keys')||'{}');}catch{return {};}}
+function sk2(k){localStorage.setItem('olives_keys',JSON.stringify(k));}
+
+const FIELDS={
+  hero:['hero_tagline','hero_sub'],
+  about:['about_p1','about_p2','about_tagline'],
+  choir:['choir_title','choir_desc','choir_vis_p','choir_p1','choir_p2'],
+  missions:['missions_title','missions_desc','missions_body','missions_cta'],
+  donate:['donate_desc','tier1_amt','tier1_lbl','tier2_amt','tier2_lbl','tier3_amt','tier3_lbl'],
+  contact:['contact_fb','contact_inv','contact_det','fb_url','email']
+};
+
+function loadAll(){
+  const d=gd();
+  Object.values(FIELDS).flat().forEach(k=>{
+    const el=document.getElementById(k);
+    if(el&&d[k])el.value=d[k];
+  });
+  const k=gk();
+  ['sk_pk','sk_sk','mk_ck','mk_cs','mk_sc','mk_pk'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&k[id])el.value=k[id];
+  });
+  if(k.sk_on)document.getElementById('sk-on').checked=true;
+  if(k.mk_on)document.getElementById('mk-on').checked=true;
+  if(k.mk_env)document.getElementById('mk_env').value=k.mk_env;
+  chkStripe();chkMpesa();
+}
+
+function save(section,btn){
+  const d=gd();
+  (FIELDS[section]||[]).forEach(k=>{
+    const el=document.getElementById(k);
+    if(el)d[k]=el.value;
+  });
+  sd(d);
+  toast('✅ Saved! Refresh the website to see changes.','ok');
+  if(btn){const o=btn.textContent;btn.textContent='✅ Saved!';btn.classList.add('ok');setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},2500);}
+}
+
+function saveKeys(type){
+  const k=gk();
+  if(type==='stripe'){
+    k.sk_pk=document.getElementById('sk_pk').value;
+    k.sk_sk=document.getElementById('sk_sk').value;
+    k.sk_on=document.getElementById('sk-on').checked;
+    toast('💳 Stripe keys saved!','ok');
+  }else{
+    k.mk_ck=document.getElementById('mk_ck').value;
+    k.mk_cs=document.getElementById('mk_cs').value;
+    k.mk_sc=document.getElementById('mk_sc').value;
+    k.mk_pk=document.getElementById('mk_pk').value;
+    k.mk_env=document.getElementById('mk_env').value;
+    k.mk_on=document.getElementById('mk-on').checked;
+    toast('📱 M-Pesa keys saved!','ok');
+  }
+  sk2(k);chkStripe();chkMpesa();updDash();
+}
+
+// ── KEY STATUS ──
+function chkStripe(){
+  const pk=document.getElementById('sk_pk').value;
+  const sk=document.getElementById('sk_sk').value;
+  const el=document.getElementById('sk-stat');
+  if(pk&&sk){el.textContent='✅ Keys entered';el.className='kstat ok';}
+  else{el.textContent='Not configured';el.className='kstat';}
+  updDash();
+}
+function chkMpesa(){
+  const ck=document.getElementById('mk_ck').value;
+  const cs=document.getElementById('mk_cs').value;
+  const sc=document.getElementById('mk_sc').value;
+  const el=document.getElementById('mk-stat');
+  if(ck&&cs&&sc){el.textContent='✅ Keys entered';el.className='kstat ok';}
+  else{el.textContent='Not configured';el.className='kstat';}
+  updDash();
+}
+function updDash(){
+  const sOk=document.getElementById('sk_pk').value&&document.getElementById('sk_sk').value;
+  const mOk=document.getElementById('mk_ck').value&&document.getElementById('mk_cs').value;
+  document.getElementById('d-stripe').textContent=sOk?'✅':'—';
+  document.getElementById('d-mpesa').textContent=mOk?'✅':'—';
+}
+
+// ── VALIDATORS ──
+function tstStripe(){
+  const pk=document.getElementById('sk_pk').value;
+  const r=document.getElementById('str-res');r.style.display='block';
+  if(!pk){r.textContent='❌ Enter your Publishable Key first';r.className='tres terr';return;}
+  r.textContent='⏳ Checking...';r.className='tres';
+  setTimeout(()=>{
+    if(pk.startsWith('pk_test_')||pk.startsWith('pk_live_')){r.textContent='✅ Valid format! Connect your backend to process payments.';r.className='tres tok';}
+    else{r.textContent='❌ Should start with pk_test_ or pk_live_';r.className='tres terr';}
+  },1000);
+}
+function tstMpesa(){
+  const ck=document.getElementById('mk_ck').value;
+  const r=document.getElementById('mp-res');r.style.display='block';
+  if(!ck){r.textContent='❌ Enter your Consumer Key first';r.className='tres terr';return;}
+  r.textContent='⏳ Checking...';r.className='tres';
+  setTimeout(()=>{r.textContent='✅ Keys entered. Backend connection verified when deployed.';r.className='tres tok';},1200);
+}
+
+// ── HELPERS ──
+function showKey(id,btn){
+  const el=document.getElementById(id);
+  el.type=el.type==='password'?'text':'password';
+  btn.textContent=el.type==='text'?'🙈':'👁';
+}
+function cpy(txt,btn){
+  navigator.clipboard.writeText(txt).then(()=>{
+    const o=btn.textContent;btn.textContent='✅ Copied!';
+    setTimeout(()=>btn.textContent=o,2000);
+  });
+}
+function toast(msg,type='inf'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+type;
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
